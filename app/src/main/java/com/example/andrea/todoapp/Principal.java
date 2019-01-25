@@ -86,6 +86,39 @@ public class Principal extends AppCompatActivity {
         updateUI();
     }
 
+    public void updateTask(View view){
+        final EditText taskEditText2 = new EditText(this);
+
+        View parent2 = (View) view.getParent();
+        TextView t = parent2.findViewById(R.id.task_title);
+        final String name = String.valueOf((t.getText()));
+        taskEditText2.setText(String.valueOf((t.getText())));
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("Update task")
+                .setMessage("Change your task")
+                .setView(taskEditText2)
+                .setPositiveButton("Update", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String task = String.valueOf(taskEditText2.getText());
+                        SQLiteDatabase db = mHelper.getWritableDatabase();
+
+                        ContentValues values = new ContentValues();
+                        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, task);
+
+                        db.update(TaskContract.TaskEntry.TABLE,
+                                values,
+                                TaskContract.TaskEntry.COL_TASK_TITLE + " = ?", new String[]{name});
+                        db.close();
+                        updateUI();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+    }
+
     private void updateUI() {
         ArrayList<String> taskList = new ArrayList<>();
         SQLiteDatabase db = mHelper.getReadableDatabase();
